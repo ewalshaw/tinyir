@@ -1,0 +1,5 @@
+Notes on Python Lists
+
+A Python list stores an ordered collection of items. Lists are mutable, so you can append, remove, and update elements. Indexing starts at zero, and negative indices count from the end.
+
+Common operations include slicing, sorting, and list comprehensions. Lists can hold mixed data types, though many programs prefer consistent types. They are one of the most useful structures for beginner programming projects.

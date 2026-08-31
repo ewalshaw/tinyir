@@ -1,0 +1,5 @@
+Introduction to Machine Learning
+
+Machine learning is a branch of artificial intelligence where computers learn patterns from data. Instead of writing explicit rules, we train models on examples. Common tasks include classification, regression, and clustering.
+
+Supervised learning uses labeled data. Unsupervised learning finds structure without labels. Neural networks can recognize images, translate languages, and generate text. Good models need clean data, careful evaluation, and thoughtful feature design.

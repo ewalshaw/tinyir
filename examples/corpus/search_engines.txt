@@ -1,0 +1,5 @@
+How Search Engines Work
+
+Search engines crawl the web, index pages, and rank results for user queries. Crawlers follow links to discover new documents. Indexing organizes words and metadata so retrieval can happen quickly.
+
+Ranking systems estimate relevance using factors such as term frequency, links, and page quality. Modern engines also consider spelling, synonyms, and user intent. Information retrieval research continues to improve speed and accuracy.
