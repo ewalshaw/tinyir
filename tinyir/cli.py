@@ -8,6 +8,7 @@ import click
 from .corpus import Corpus
 from .index import InvertedIndex, build_index
 from .rank import format_search_table, rank
+from .tokenize import tokenize
 
 
 DEFAULT_INDEX_DIR = Path(".tinyir")
@@ -80,6 +81,11 @@ def search_cmd(query: str, index_dir: Path, top_k: int) -> None:
         raise click.ClickException(
             f"Failed to load index artifacts from {index_dir}: {exc}"
         ) from exc
+
+    query_terms = tokenize(query, remove_stopwords=search_index.remove_stopwords)
+    if not query_terms:
+        click.echo("Query empty after tokenization.")
+        return
 
     results = rank(search_index, query, top_k=top_k)
     if not results:

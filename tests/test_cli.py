@@ -117,4 +117,45 @@ def test_index_with_remove_stopwords(tmp_path: Path):
         ["search", "the and in", "-i", str(index_dir)],
     )
     assert search_result.exit_code == 0
+    assert "Query empty after tokenization." in search_result.output
+    assert "No results found." not in search_result.output
+
+
+def test_search_reports_empty_query_for_whitespace(tmp_path: Path):
+    corpus_dir = _make_corpus(tmp_path / "corpus")
+    index_dir = tmp_path / "index"
+    runner = CliRunner()
+
+    index_result = runner.invoke(
+        tinyir,
+        ["index", str(corpus_dir), "-o", str(index_dir)],
+    )
+    assert index_result.exit_code == 0
+
+    search_result = runner.invoke(
+        tinyir,
+        ["search", "   ", "-i", str(index_dir)],
+    )
+    assert search_result.exit_code == 0
+    assert "Query empty after tokenization." in search_result.output
+    assert "No results found." not in search_result.output
+
+
+def test_search_reports_no_results_for_unknown_terms(tmp_path: Path):
+    corpus_dir = _make_corpus(tmp_path / "corpus")
+    index_dir = tmp_path / "index"
+    runner = CliRunner()
+
+    index_result = runner.invoke(
+        tinyir,
+        ["index", str(corpus_dir), "-o", str(index_dir)],
+    )
+    assert index_result.exit_code == 0
+
+    search_result = runner.invoke(
+        tinyir,
+        ["search", "xylophone zebra", "-i", str(index_dir)],
+    )
+    assert search_result.exit_code == 0
     assert "No results found." in search_result.output
+    assert "Query empty after tokenization." not in search_result.output
