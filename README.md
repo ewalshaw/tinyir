@@ -1,12 +1,10 @@
 # TinyIR
 
-Command-line information retrieval over plain-text files. Indexes a folder of `.txt` documents and ranks them with tokenization, an inverted index, TF-IDF, and cosine similarity.
+Command-line information retrieval over plain-text files. Indexes a folder of `.txt` documents and ranks them with tokenization, an inverted index, TF-IDF, and cosine similarity. Includes the option to filter common English stopwords (ex. "the", "in", "a") using `--remove-stopwords`.
 
 ## Why TinyIR?
 
-Search engines combine tokenization, inverted indexes, term weighting, and similarity scoring. Full systems like Elasticsearch wrap that in a large API and distributed setup, which makes the basics harder to study.
-
-TinyIR is a small Python pipeline you can run locally: load files, build an index, run queries. No database or web server required. Useful for learning IR or prototyping keyword search on a file corpus.
+TinyIR is a Python pipeline you can run locally by loading files, building an index, and running queries without requiring a database or web server.
 
 ## Overview
 
@@ -20,7 +18,6 @@ Each `.txt` file in a folder is one document. Indexing:
 
 Search vectorizes the query with the saved model, scores documents with cosine similarity, and prints a table of rank, similarity score, `doc_id`, and filename.
 
-Modules: `corpus`, `tokenize`, `index`, `rank`, `cli`.
 
 ## Installation
 
@@ -46,8 +43,6 @@ After install, you can run commands either way:
 
 Both accept the same arguments. Use `python -m tinyir` if you prefer not to change `PATH`. Use `tinyir` directly if Python's script directory is already on `PATH`.
 
-`pip` installs the `tinyir` executable into Python's scripts directory. If the command is not found, add that directory to `PATH`.
-
 Verify either method works:
 
 ```bash
@@ -57,7 +52,7 @@ tinyir --help
 
 ## Usage
 
-Examples below use `tinyir`. Replace with `python -m tinyir` if needed.
+Examples below use `tinyir`. Replace with `python -m tinyir` as needed.
 
 ### Index
 
