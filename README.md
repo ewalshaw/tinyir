@@ -2,6 +2,8 @@
 
 Command-line information retrieval over plain-text files. Indexes a folder of `.txt` documents and ranks them with tokenization, an inverted index, TF-IDF, and cosine similarity. Includes the option to filter common English stopwords (ex. "the", "in", "a") using `--remove-stopwords`.
 
+Run `tinyir --demo` for an example of use.
+
 ## Why TinyIR?
 
 TinyIR is a Python pipeline you can run locally by loading files, building an index, and running queries without requiring a database or web server.
@@ -17,7 +19,6 @@ Each `.txt` file in a folder is one document. Indexing:
 5. Writes pickle artifacts to `.tinyir/` by default.
 
 Search vectorizes the query with the saved model, scores documents with cosine similarity, and prints a table of rank, similarity score, `doc_id`, and filename.
-
 
 ## Installation
 
@@ -35,6 +36,7 @@ Dependencies: `scikit-learn`, `numpy`, `click`.
 
 After install, you can run commands either way:
 
+
 | Method  | Example                                  |
 | ------- | ---------------------------------------- |
 | Module  | `python -m tinyir index examples/corpus` |
@@ -49,6 +51,8 @@ Verify either method works:
 python -m tinyir --help
 tinyir --help
 ```
+
+
 
 ## Usage
 
@@ -103,10 +107,12 @@ Rank  Similarity  doc_id  Filename
 3     0.0568      9       public_library.txt
 ```
 
-### Demo script
+
+
+### Run Demo
 
 ```bash
-python examples/demo.py
+tinyir --demo
 ```
 
 Indexes `examples/corpus/` in memory and runs sample queries.
@@ -130,6 +136,8 @@ examples/
 tests/
 design.md      architecture and data flow
 ```
+
+
 
 ## Design
 

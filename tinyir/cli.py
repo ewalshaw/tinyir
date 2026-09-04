@@ -1,11 +1,13 @@
 """CLI for TinyIR."""
 
 import pickle
+import sys
 from pathlib import Path
 
 import click
 
 from .corpus import Corpus
+from .demo import run_demo
 from .index import InvertedIndex, build_index
 from .rank import format_search_table, rank
 from .tokenize import tokenize
@@ -14,9 +16,31 @@ from .tokenize import tokenize
 DEFAULT_INDEX_DIR = Path(".tinyir")
 
 
-@click.group()
-def tinyir() -> None:
-    """Minimal information retrieval engine."""
+@click.group(invoke_without_command=True)
+@click.option(
+    "--demo",
+    is_flag=True,
+    is_eager=True,
+    help="Run the bundled example demo (ignores other options and commands).",
+)
+@click.pass_context
+def tinyir(ctx: click.Context, demo: bool) -> None:
+    """Minimal information retrieval engine.
+
+    \b
+    Quick start:
+      tinyir --demo
+          Index examples/corpus in memory and run sample queries.
+      tinyir index <folder>
+          Build and save an index under .tinyir/ (or -o <path>).
+      tinyir search "<query>"
+          Rank documents from a previously built index.
+    """
+    if demo:
+        run_demo()
+        ctx.exit()
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
 
 @tinyir.command("index")
@@ -95,4 +119,10 @@ def search_cmd(query: str, index_dir: Path, top_k: int) -> None:
     click.echo(format_search_table(results))
 
 
-main = tinyir
+def main(argv: list[str] | None = None) -> None:
+    """CLI entry point. ``--demo`` short-circuits and ignores all other args."""
+    args = list(sys.argv[1:] if argv is None else argv)
+    if "--demo" in args:
+        run_demo()
+        return
+    tinyir.main(args=args, prog_name="tinyir")

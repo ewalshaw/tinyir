@@ -4,7 +4,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from tinyir.cli import tinyir
+from tinyir.cli import main, tinyir
 from tinyir.index import DOCUMENTS_FILE, INVERTED_INDEX_FILE, TFIDF_MODEL_FILE, VOCABULARY_FILE
 
 
@@ -159,3 +159,21 @@ def test_search_reports_no_results_for_unknown_terms(tmp_path: Path):
     assert search_result.exit_code == 0
     assert "No results found." in search_result.output
     assert "Query empty after tokenization." not in search_result.output
+
+
+def test_demo_flag_runs_bundled_demo(capsys):
+    main(["--demo"])
+    output = capsys.readouterr().out
+
+    assert "Indexing" in output
+    assert "machine_learning.txt" in output
+    assert "Query empty after tokenization." in output
+    assert "No results found." in output
+
+
+def test_demo_flag_ignores_other_args(capsys):
+    main(["--demo", "search", "ignored", "--remove-stopwords", "-k", "1"])
+    output = capsys.readouterr().out
+
+    assert "Indexing" in output
+    assert "Error" not in output
