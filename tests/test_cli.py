@@ -83,6 +83,24 @@ def test_search_fails_when_index_missing(tmp_path: Path):
     assert "missing required pickle files" in result.output
 
 
+def test_search_suggests_index_when_directory_missing(tmp_path: Path):
+    missing_dir = tmp_path / "no-such-index"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        tinyir,
+        ["search", "query", "-i", str(missing_dir)],
+    )
+
+    assert result.exit_code != 0
+    assert "Directory does not exist." not in result.output
+    assert (
+        "Error: Index directory "
+        f"{missing_dir} does not exist.\n"
+        "Run 'tinyir index <folder>' first, or 'tinyir --help' for more information."
+    ) in result.output
+
+
 def test_index_with_remove_stopwords(tmp_path: Path):
     corpus_dir = _make_corpus(tmp_path / "corpus")
     index_dir = tmp_path / "index"

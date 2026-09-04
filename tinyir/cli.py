@@ -58,7 +58,7 @@ def index_cmd(folder: Path, output: Path, remove_stopwords: bool) -> None:
 @click.option(
     "--index-dir",
     "-i",
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    type=click.Path(file_okay=False, path_type=Path),
     default=DEFAULT_INDEX_DIR,
     show_default=True,
     help="Directory containing saved pickle artifacts.",
@@ -66,6 +66,12 @@ def index_cmd(folder: Path, output: Path, remove_stopwords: bool) -> None:
 @click.option("--top-k", "-k", default=10, show_default=True, help="Number of results.")
 def search_cmd(query: str, index_dir: Path, top_k: int) -> None:
     """Load the saved index and print ranked search results."""
+    if not index_dir.is_dir():
+        raise click.ClickException(
+            f"Index directory {index_dir} does not exist.\n"
+            "Run 'tinyir index <folder>' first, or 'tinyir --help' for more information."
+        )
+
     try:
         search_index = InvertedIndex.load(index_dir)
     except FileNotFoundError as exc:
