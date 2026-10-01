@@ -20,6 +20,7 @@ class Corpus:
 
     def __init__(self, directory: Path) -> None:
         self.directory = directory.resolve()
+        self.skipped_invalid = 0
         self.documents: list[Document] = self._load_documents()
 
     def _load_documents(self) -> list[Document]:
@@ -28,6 +29,7 @@ class Corpus:
             try:
                 text = path.read_text(encoding="utf-8")
             except UnicodeDecodeError:
+                self.skipped_invalid += 1
                 warnings.warn(
                     f"Skipping {path.name}: not valid UTF-8",
                     stacklevel=2,

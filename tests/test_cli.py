@@ -55,6 +55,30 @@ def test_index_skips_invalid_utf8(tmp_path: Path):
     assert "Indexed 1 document(s)" in result.output
 
 
+def test_index_skips_some_invalid_utf8_and_indexes_the_rest(tmp_path: Path):
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir()
+    (corpus_dir / "bad_a.txt").write_bytes(b"\xff\xfe")
+    (corpus_dir / "bad_b.txt").write_bytes(b"\xff\xfe")
+    (corpus_dir / "good_a.txt").write_text("one two three", encoding="utf-8")
+    (corpus_dir / "good_b.txt").write_text("hello world", encoding="utf-8")
+    index_dir = tmp_path / "index"
+
+    runner = CliRunner()
+    with pytest.warns(UserWarning) as caught:
+        result = runner.invoke(
+            tinyir,
+            ["index", str(corpus_dir), "-o", str(index_dir)],
+        )
+
+    assert [str(warning.message) for warning in caught] == [
+        "Skipping bad_a.txt: not valid UTF-8",
+        "Skipping bad_b.txt: not valid UTF-8",
+    ]
+    assert result.exit_code == 0
+    assert "Indexed 2 document(s)" in result.output
+
+
 def test_index_fails_on_empty_folder(tmp_path: Path):
     empty_dir = tmp_path / "empty"
     empty_dir.mkdir()
@@ -64,6 +88,39 @@ def test_index_fails_on_empty_folder(tmp_path: Path):
 
     assert result.exit_code != 0
     assert "No .txt files found" in result.output
+
+
+def test_index_fails_when_all_files_are_invalid_utf8(tmp_path: Path):
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir()
+    (corpus_dir / "bad.txt").write_bytes(b"\xff\xfe")
+
+    runner = CliRunner()
+    with pytest.warns(UserWarning, match="Skipping bad.txt"):
+        result = runner.invoke(tinyir, ["index", str(corpus_dir)])
+
+    assert result.exit_code != 0
+    assert "No valid UTF-8 .txt files found" in result.output
+    assert "No .txt files found" not in result.output
+
+
+def test_index_fails_when_five_files_are_invalid_utf8(tmp_path: Path):
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir()
+    names = [f"bad_{i}.txt" for i in range(1, 6)]
+    for name in names:
+        (corpus_dir / name).write_bytes(b"\xff\xfe")
+
+    runner = CliRunner()
+    with pytest.warns(UserWarning) as caught:
+        result = runner.invoke(tinyir, ["index", str(corpus_dir)])
+
+    assert [str(warning.message) for warning in caught] == [
+        f"Skipping {name}: not valid UTF-8" for name in names
+    ]
+    assert result.exit_code != 0
+    assert "No valid UTF-8 .txt files found" in result.output
+    assert "No .txt files found" not in result.output
 
 
 def test_search_returns_ranked_results(tmp_path: Path):

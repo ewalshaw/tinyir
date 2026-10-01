@@ -63,6 +63,8 @@ def index_cmd(folder: Path, output: Path, remove_stopwords: bool) -> None:
     """Build the corpus, inverted index, and TF-IDF model."""
     corpus = Corpus(folder)
     if not corpus.documents:
+        if corpus.skipped_invalid:
+            raise click.ClickException(f"No valid UTF-8 .txt files found in {folder}")
         raise click.ClickException(f"No .txt files found in {folder}")
 
     search_index = build_index(
