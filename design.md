@@ -39,7 +39,7 @@ Small Python library with a Click CLI. Each module handles one pipeline stage. N
 
 | Module        | Role                                                                    |
 | ------------- | ----------------------------------------------------------------------- |
-| `corpus.py`   | Load `*.txt` files, assign `doc_id`, expose `Document` records.         |
+| `corpus.py`   | Load `*.txt` files, skip invalid UTF-8 with a warning, assign `doc_id`, expose `Document` records. |
 | `tokenize.py` | Lowercase, strip punctuation, split tokens; optional stopwords.         |
 | `index.py`    | Build inverted index and TF-IDF vectors; save/load pickles.             |
 | `rank.py`     | Vectorize query, cosine similarity, return top-`k` `SearchResult` list. |
@@ -69,7 +69,7 @@ Indexing writes four pickle files under `.tinyir/` (or `-o` path):
 
 ### Index (`tinyir index <folder>`)
 
-1. `Corpus` loads sorted `*.txt` files and assigns sequential `doc_id` values.
+1. `Corpus` loads sorted `*.txt` files, skips files that are not valid UTF-8, and assigns sequential `doc_id` values only to files that load.
 2. Each document is tokenized once (optional stopword filter).
 3. Term frequencies populate inverted-index postings lists.
 4. `TfidfVectorizer.fit_transform()` fits the model on tokenized text and produces the vocabulary and TF-IDF document matrix. Search later reuses the saved vectorizer with `transform()` only (see search flow below).

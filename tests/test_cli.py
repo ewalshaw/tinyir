@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import pytest
 from click.testing import CliRunner
 
 from tinyir.cli import main, tinyir
@@ -34,6 +35,24 @@ def test_index_creates_artifacts(tmp_path: Path):
     assert (index_dir / DOCUMENTS_FILE).exists()
     assert (index_dir / INVERTED_INDEX_FILE).exists()
     assert "Indexed 2 document(s)" in result.output
+
+
+def test_index_skips_invalid_utf8(tmp_path: Path):
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir()
+    (corpus_dir / "good.txt").write_text("hello world", encoding="utf-8")
+    (corpus_dir / "bad.txt").write_bytes(b"\xff\xfe")
+    index_dir = tmp_path / "index"
+
+    runner = CliRunner()
+    with pytest.warns(UserWarning, match="Skipping bad.txt"):
+        result = runner.invoke(
+            tinyir,
+            ["index", str(corpus_dir), "-o", str(index_dir)],
+        )
+
+    assert result.exit_code == 0
+    assert "Indexed 1 document(s)" in result.output
 
 
 def test_index_fails_on_empty_folder(tmp_path: Path):

@@ -64,6 +64,8 @@ Examples below use `tinyir`. Replace with `python -m tinyir` as needed.
 tinyir index examples/corpus
 ```
 
+Files that are not valid UTF-8 are skipped with a warning. Indexing continues with the remaining `.txt` files.
+
 Custom output directory:
 
 ```bash

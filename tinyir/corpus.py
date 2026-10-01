@@ -1,5 +1,6 @@
 """Corpus loading utilities for TinyIR."""
 
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -23,13 +24,21 @@ class Corpus:
 
     def _load_documents(self) -> list[Document]:
         documents: list[Document] = []
-        for doc_id, path in enumerate(sorted(self.directory.glob("*.txt"))):
+        for path in sorted(self.directory.glob("*.txt")):
+            try:
+                text = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                warnings.warn(
+                    f"Skipping {path.name}: not valid UTF-8",
+                    stacklevel=2,
+                )
+                continue
             documents.append(
                 Document(
-                    doc_id=doc_id,
+                    doc_id=len(documents),
                     filename=path.name,
                     path=path.resolve(),
-                    text=path.read_text(encoding="utf-8"),
+                    text=text,
                 )
             )
         return documents
@@ -42,5 +51,5 @@ class Corpus:
 
 
 def load_corpus(directory: Path) -> list[Document]:
-    """Load all ``.txt`` files from ``directory`` and assign document IDs."""
+    """Load UTF-8 ``.txt`` files from ``directory`` and assign document IDs."""
     return Corpus(directory).documents
